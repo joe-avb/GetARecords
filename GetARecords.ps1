@@ -26,12 +26,12 @@ foreach ($u in $UrlImport) {
         $domain = $domain.Namehost | Out-String
     }
     $domain.trim()
-    $DnsAList += Resolve-DnsName $domain.trim() 
-} 
+    $DnsAList += Resolve-DnsName $domain.trim()
+}
 
 $DnsAListSorted = $DnsAList |
 Select-Object -Unique Name,@{N='IP_1';E={$_.IPAddress}} |
-Sort-Object -Property Name,IP_1 
+Sort-Object -Property Name,IP_1
 $convRecords = [System.Linq.Enumerable]::Aggregate($DnsAListSorted, [System.Func[System.Object, System.Object, System.Object]]{
   $args[0]
 
@@ -44,7 +44,7 @@ $convRecords = [System.Linq.Enumerable]::Aggregate($DnsAListSorted, [System.Func
     do {
       $idx++
     } while ($chkDom."IP_$idx")
-    
+
     Add-Member -InputObject $chkDom -NotePropertyName ("IP_$idx") -NotePropertyValue $args[1].IP_1
   } else {
     $args[1]
@@ -77,4 +77,4 @@ $convRecordsCompleted = $convRecords | Sort-Object { $_.PSObject.Properties.Coun
   return $_
 }
 
-$convRecordsCompleted | Export-Csv -Path ".\DnsAList.csv"
+$convRecordsCompleted | Export-Csv -Path ".\DnsAList_$(get-date -f yyyy-MM-dd).csv"
